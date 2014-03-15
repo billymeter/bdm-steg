@@ -1,4 +1,4 @@
-import Image
+#import Image
 import os
 import sys
 
@@ -71,11 +71,14 @@ def decode(img):
     # convert the chunks to characters, join, return
     return ''.join([chr(int(''.join(map(str, x)), 2)) for x in msg_chunks])
 
-
-if __name__ == '__main__':
+def main():
     img = Image.open("mario.png")
     img2 = encode(img, "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
     img2.save("newmario.png")
     print decode(img2)
     test_img = Image.open("newmario.png")
     print decode(test_img)
+
+
+if __name__ == '__main__':
+    main()
