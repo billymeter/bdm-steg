@@ -1,4 +1,4 @@
-#import Image
+import Image
 import os
 import sys
 
