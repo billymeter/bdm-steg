@@ -11,12 +11,12 @@ def chunks(l, n):
 
 def encode(img, msg):
     # convert message to bits; padded to 8 bits
-    msg_bits = flatten([list(format(ord(x), 'b').zfill(8)) for x in msg])
+    msg_bits = flatten(list(format(ord(x), 'b').zfill(8)) for x in msg)
     msg_len = len(msg_bits) / 8
 
     # check that message will fit
     if msg_len > img.size[0] * img.size[1] * 3 - 1:
-        pass
+        raise IndexError
 
     # load 2d array of pixels
     pix = img.load()
@@ -34,10 +34,8 @@ def encode(img, msg):
     # msg length in chars = r*100 + g*10 + b
     # this gives a maximum message length of 255*100 + 255*10 + 255
     r_count = msg_len/100
-    msg_len -= r_count * 100
-    g_count = msg_len/10
-    msg_len -= g_count * 10
-    b_count = msg_len
+    g_count = (msg_len - r_count*100)/10
+    b_count = msg_len - g_count*10 - r_count*100
     pix[pix_stream.next()] = (r_count, g_count, b_count)
 
     index = 0
@@ -67,7 +65,7 @@ def decode(img):
     # grab all the message bits from the image
     msg_bits = [rgb_cycle.next() % 2 for i in range(bitcount)]
 
-    # chunkify the bits (using 7-bits, but 8 would cover ascii better)
+    # create 8-bit chunks
     msg_chunks = list(chunks(msg_bits, 8))
 
     # convert the chunks to characters, join, return
