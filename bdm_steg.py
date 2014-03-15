@@ -1,4 +1,5 @@
-import Image
+from PIL import Image
+from PIL import PngImagePlugin
 import os
 import sys
 
@@ -8,6 +9,16 @@ def flatten(l):
 def chunks(l, n):
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
+
+def save_png(img, file):
+    nochange = ('gamma', 'transparency', 'interlace', 'dpi', 'aspect')
+
+    meta = PngImagePlugin.PngInfo()
+    for k, v in img.info.iteritems():
+        if k in nochange: continue
+        meta.add_text(k, v)
+
+    img.save(file, "PNG", pnginfo=meta)
 
 def encode(img, msg):
     # convert message to bits; padded to 8 bits
@@ -74,7 +85,7 @@ def decode(img):
 def main():
     img = Image.open("mario.png")
     img2 = encode(img, "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
-    img2.save("newmario.png")
+    save_png(img2, "newmario.png")
     print decode(img2)
     test_img = Image.open("newmario.png")
     print decode(test_img)
