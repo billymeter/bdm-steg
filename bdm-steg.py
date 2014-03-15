@@ -10,11 +10,12 @@ def chunks(l, n):
         yield l[i:i+n]
 
 def encode(img, msg):
-    # convert message to bits; padded to 7-bits (8 may be better)
-    msg_bits = flatten([list(format(ord(x), 'b').zfill(7)) for x in msg])
+    # convert message to bits; padded to 8 bits
+    msg_bits = flatten([list(format(ord(x), 'b').zfill(8)) for x in msg])
+    msg_len = len(msg_bits) / 8
 
     # check that message will fit
-    if len(msg_bits) > img.size[0] * img.size[1] * 3 - 1:
+    if msg_len > img.size[0] * img.size[1] * 3 - 1:
         pass
 
     # load 2d array of pixels
@@ -29,10 +30,15 @@ def encode(img, msg):
         pixel[index] = int(''.join(list(bin(pixel[index]))[:-1] + [bit]), 2)
         return tuple(pixel)
 
-    # set the r value of the first pixel to the message length;
-    # could be a better way to do this
-    len_pix = pix_stream.next()
-    pix[len_pix] = (len(msg_bits), pix[len_pix][1], pix[len_pix][2])
+    # first pixel is the message length; the format is:
+    # msg length in chars = r*100 + g*10 + b
+    # this gives a maximum message length of 255*100 + 255*10 + 255
+    r_count = msg_len/100
+    msg_len -= r_count * 100
+    g_count = msg_len/10
+    msg_len -= g_count * 10
+    b_count = msg_len
+    pix[pix_stream.next()] = (r_count, g_count, b_count)
 
     index = 0
     for bit in msg_bits:
@@ -52,16 +58,17 @@ def decode(img):
                               for y in xrange(img.size[1])
                               for i in xrange(3))
 
-    # r value of first pixel is message length in bits; could be better
-    bitcount = rgb_cycle.next()
-    rgb_cycle.next() # throw away rest
-    rgb_cycle.next() # of first pixel
+    # deriving bitcount from msg length in first pixel, which has format:
+    # msg length in chars = r*100 + g*10 + b
+    bitcount = rgb_cycle.next() * 8 * 100
+    bitcount += rgb_cycle.next() * 8 * 10
+    bitcount += rgb_cycle.next() * 8
 
     # grab all the message bits from the image
     msg_bits = [rgb_cycle.next() % 2 for i in range(bitcount)]
 
     # chunkify the bits (using 7-bits, but 8 would cover ascii better)
-    msg_chunks = list(chunks(msg_bits, 7))
+    msg_chunks = list(chunks(msg_bits, 8))
 
     # convert the chunks to characters, join, return
     return ''.join([chr(int(''.join(map(str, x)), 2)) for x in msg_chunks])
@@ -69,7 +76,7 @@ def decode(img):
 
 if __name__ == '__main__':
     img = Image.open("mario.png")
-    img2 = encode(img, "I'mma walking here!")
+    img2 = encode(img, "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
     img2.save("newmario.png")
     print decode(img2)
     test_img = Image.open("newmario.png")
