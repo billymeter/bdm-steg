@@ -4,55 +4,73 @@ import sys
 import os
 import bdm_steg
 
+
 def max_fit(src_size, tgt_size):
     src_width, src_height = src_size[0], src_size[1]
     tgt_width, tgt_height = tgt_size[0], tgt_size[1]
-    ratio_w = float(tgt_width) / src_width;
-    ratio_h = float(tgt_height) / src_height;
+    ratio_w = float(tgt_width) / src_width
+    ratio_h = float(tgt_height) / src_height
 
     ratio = ratio_w if ratio_w < ratio_h else ratio_h
 
-    return (src_width * ratio, src_height * ratio)
+    return src_width * ratio, src_height * ratio
 
-class KeyPanel(wx.Panel):
+
+class StatusPanel(wx.Panel):
+    def __init__(self, parent, ID):
+        wx.Panel.__init__(self, parent, ID)
+        self.sizer = wx.GridSizer(rows=2, cols=3)
+        self.image_status = wx.StaticText(self, wx.ID_ANY, label="Image loaded:")
+        self.file_status = wx.StaticText(self, wx.ID_ANY, label="File loaded:")
+        self.key_status = wx.StaticText(self, wx.ID_ANY, label="Key loaded:")
+        self.sizer.AddMany(
+            [(self.image_status, wx.ID_ANY, wx.ALIGN_CENTER),
+             (self.file_status, wx.ID_ANY, wx.ALIGN_CENTER),
+             (self.key_status, wx.ID_ANY, wx.ALIGN_CENTER)])
+        self.SetSizer(self.sizer)
+
+
+class ExecutePanel(wx.Panel):
+    def __init__(self, parent, ID):
+        wx.Panel.__init__(self, parent, ID)
+        self.sizer = wx.GridSizer(cols=2)
+        self.encode_btn = wx.Button(self, label="Encode", id=wx.ID_ANY)
+        self.decode_btn = wx.Button(self, label="Decode", id=wx.ID_ANY)
+        self.sizer.AddMany(
+            [(self.encode_btn, wx.ID_ANY, wx.ALIGN_CENTER),
+            (self.decode_btn, wx.ID_ANY, wx.ALIGN_CENTER)])
+        self.SetSizer(self.sizer)
+
+
+class OptionsPanel(wx.Panel):
     def __init__(self, parent, ID):
         wx.Panel.__init__(self, parent, ID)
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.key_label = wx.StaticText(self, label="Enter key:")
-        self.key_box = wx.TextCtrl(self, value="", style=wx.TE_MULTILINE)
-        self.load_key = wx.Button(self, label="Load", id=wx.ID_OK)
-        self.sizer.AddMany(
-            [(self.key_label, wx.ID_ANY, wx.ALIGN_CENTER),
-            (self.key_box, wx.ID_ANY, wx.EXPAND),
-            (self.load_key, wx.ID_ANY, wx.ALIGN_CENTER)])
+        self.option = wx.CheckBox(self, wx.ID_ANY, label="An option!")
+        self.sizer.Add(self.option, wx.ID_ANY, wx.ALIGN_CENTER)
         self.SetSizer(self.sizer)
+
 
 class LeftPanel(wx.Panel):
     def __init__(self, parent, ID):
         wx.Panel.__init__(self, parent, ID)
-        self.dirname = ''
-        self.SetBackgroundColour(wx.WHITE)
+        self.dirname = parent.dirname
+        self.filename = parent.filename
         self.parent = parent
         self.width, self.height = self.GetSize()
-        self.load_image = filebrowse.FileBrowseButton(
-            self, wx.ID_ANY, labelText="Load Image", buttonText="Choose file...",
-            fileMask=("Images (*.bmp,*.gif,*.png,*.jpg)|*.bmp;*.gif;*.png;*.jpg|"
-                      "BMP files (*.bmp)|*.bmp|GIF files (*.gif)|*.gif|"
-                      "PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
-            changeCallback=self.SendImage(parent.right_panel))
-        self.load_file = filebrowse.FileBrowseButton(
-            self, wx.ID_ANY, labelText="Load Message", buttonText="Choose file...",
-            changeCallback=self.SendImage(parent.right_panel))
-        self.key_panel = KeyPanel(self, wx.ID_ANY)
 
-        self.load_image.SetBackgroundColour((105,210,231))
-        self.load_file.SetBackgroundColour((167,219,216))
-        self.key_panel.SetBackgroundColour((224,228,204))
+        self.code_panel = ExecutePanel(self, wx.ID_ANY)
+        self.options_panel = OptionsPanel(self, wx.ID_ANY)
+        self.status_panel = StatusPanel(self, wx.ID_ANY)
+
+        self.code_panel.SetBackgroundColour((105,210,231))
+        self.options_panel.SetBackgroundColour((167,219,216))
+        self.status_panel.SetBackgroundColour((224,228,204))
 
         self.sizer = wx.GridSizer(rows=3)
-        self.sizer.Add(self.load_image, wx.ID_ANY, wx.EXPAND)
-        self.sizer.Add(self.load_file, wx.ID_ANY, wx.EXPAND)
-        self.sizer.Add(self.key_panel, wx.ID_ANY, wx.EXPAND)
+        self.sizer.Add(self.code_panel, wx.ID_ANY, wx.EXPAND)
+        self.sizer.Add(self.options_panel, wx.ID_ANY, wx.EXPAND)
+        self.sizer.Add(self.status_panel, wx.ID_ANY, wx.EXPAND)
         self.SetSizer(self.sizer)
 
     def SendImage(self, tgt_panel):
@@ -70,12 +88,6 @@ class RightPanel(wx.Panel):
         self.parent = parent
         self.width, self.height = self.GetSize()
         self.image = None
-        wx.EVT_PAINT(self, self.OnPaint)
-
-    def OnPaint(self, evt):
-        dc = wx.PaintDC(self)
-        if self.image:
-            dc.DrawBitmap(self.image.ConvertToBitmap(), 0,0)
 
     def DisplayImage(self, image):
         """ Load an image """
@@ -83,17 +95,19 @@ class RightPanel(wx.Panel):
         if display_rect[2] < image.GetWidth() or display_rect[3] < image.GetHeight():
             self.parent.Maximize()
             image = image.Scale(*max_fit(image.GetSize(),
-                                   self.GetSize()),
-                                   quality=wx.IMAGE_QUALITY_HIGH)
+                                self.GetSize()),
+                                quality=wx.IMAGE_QUALITY_HIGH)
         else:
             image = image.Scale(*self.GetSize(), quality=wx.IMAGE_QUALITY_HIGH)
         wx.StaticBitmap(self, -1, wx.BitmapFromImage(image))
+
 
 class Frame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, wx.ID_ANY)
         self.dirname = ''
-
+        self.filename = None
+        self.steg = bdm_steg.BDMSteg()
         self.width, self.height = 512, 480
         self.SetInitialSize((512,480))
 
@@ -104,19 +118,20 @@ class Frame(wx.Frame):
 
         self.SetTitle("bdm-steg")
 
-        #initialize menu bar
-        menu_bar = wx.MenuBar()
+        #initialize toolbar
+        toolbar = self.CreateToolBar(wx.TB_TEXT|wx.TB_NOICONS)
 
-        #file menu options
-        file_menu = wx.Menu()
-        m_load = file_menu.Append(wx.ID_OPEN, "&Open Image\tAlt-O", "Load Image")
-        m_exit = file_menu.Append(wx.ID_EXIT, "E&xit\tAlt-X", "Exit")
-        self.Bind(wx.EVT_MENU, self.OnOpen, m_load)
-        self.Bind(wx.EVT_MENU, self.Kill, m_exit)
-        menu_bar.Append(file_menu, "&File")
-
-        #finalize menu bar
-        self.SetMenuBar(menu_bar)
+        m_image = toolbar.AddLabelTool(wx.ID_OPEN, "Load image", wx.NullBitmap, longHelp="Load containing image")
+        m_file = toolbar.AddLabelTool(wx.ID_FILE, "Load file", wx.NullBitmap, longHelp="Load file to hide")
+        m_key = toolbar.AddLabelTool(wx.ID_ADD, "Add key", wx.NullBitmap, longHelp="Add encryption key")
+        m_help = toolbar.AddLabelTool(wx.ID_HELP, "Help", wx.NullBitmap, longHelp="Get instructions")
+        m_exit = toolbar.AddLabelTool(wx.ID_EXIT, "Exit", wx.NullBitmap, longHelp="Exit program")
+        self.Bind(wx.EVT_TOOL, self.LoadImage, m_image)
+        self.Bind(wx.EVT_TOOL, self.LoadFile, m_file)
+        self.Bind(wx.EVT_TOOL, self.LoadKey, m_key)
+        self.Bind(wx.EVT_TOOL, self.Kill, m_help)
+        self.Bind(wx.EVT_TOOL, self.Kill, m_exit)
+        toolbar.Realize()
 
         #status bar
         self.statusbar = self.CreateStatusBar()
@@ -143,21 +158,35 @@ class Frame(wx.Frame):
     def OnSize(self, event):
         self.Layout()
 
-    def OnOpen(self, event):
+    def LoadImage(self, event):
         """ Load an image """
         dlg = wx.FileDialog(self, "Choose a file", self.dirname, "",
                             wildcard=("Images (*.bmp,*.gif,*.png,*.jpg)|"
-                                              "*.bmp;*.gif;*.png;*.jpg|"
+                                      "*.bmp;*.gif;*.png;*.jpg|"
                                       "BMP files (*.bmp)|*.bmp|"
                                       "GIF files (*.gif)|*.gif|"
                                       "PNG files (*.png)|*.png|"
                                       "JPG files (*.jpg)|*.jpg"),
                             style=wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
-            self.filename, self.dirname = dlg.GetFilename(), dlg.GetDirectory()
-            bitmap = wx.Image(os.path.join(self.dirname, self.filename))
-            self.right_panel.DisplayImage(bitmap)
+            filename, self.dirname = dlg.GetFilename(), dlg.GetDirectory()
+            image = wx.Image(os.path.join(self.dirname, filename))
+            self.right_panel.DisplayImage(image)
+            self.steg.set_image(image)
         dlg.Destroy()
+
+    def LoadFile(self, event):
+        """ Load a file """
+        dlg = wx.FileDialog(self, "Choose a file", self.dirname, "",
+                            style=wx.OPEN)
+        if dlg.ShowModal() == wx.ID_OK:
+            self.filename, self.dirname = dlg.GetFilename(), dlg.GetDirectory()
+            bitmap = wx.Image(os.path.join(self.dirname, filename))
+            self.steg.set_file(os.path.join(self.dirname, filename))
+        dlg.Destroy()
+
+    def LoadKey(self, event):
+        self.steg.set_key('dummy')
 
     def Update(self, event):
         pass
