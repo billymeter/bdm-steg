@@ -157,11 +157,7 @@ class Frame(wx.Frame):
             self.steg.set_image(image)
 
             # better way to update this stuff?
-            self.status_bar.SetStatusText("Image loaded: %s" % self.image_name, 0)
-            if self.key_str != "None":
-                if self.file_name != "None":
-                    self.toolbar.EnableTool(self.ID_ENCODE, True)
-                self.toolbar.EnableTool(self.ID_DECODE, True)
+            self.Update()
         dlg.Destroy()
 
     def LoadFile(self, event):
@@ -174,9 +170,7 @@ class Frame(wx.Frame):
             self.steg.set_file(os.path.join(self.dir_name, self.file_name))
 
             # better way to update this stuff?
-            self.status_bar.SetStatusText("File loaded: %s" % self.file_name, 1)
-            if self.key_str != "None" and self.image_name != "None":
-                self.toolbar.EnableTool(self.ID_ENCODE, True)
+            self.Update()
         dlg.Destroy()
 
     def LoadKey(self, event):
@@ -184,14 +178,16 @@ class Frame(wx.Frame):
         self.key_str = 'dummy'
 
         # better way to update this stuff?
+        self.Update()
+
+    def Update(self):
+        self.status_bar.SetStatusText("Image loaded: %s" % self.image_name, 0)
+        self.status_bar.SetStatusText("File loaded: %s" % self.file_name, 1)
         self.status_bar.SetStatusText("Key loaded: %s" % self.key_str, 2)
-        if self.image_name != "None":
+        if self.image_name != "None" and self.key_str != "None":
             if self.file_name != "None":
                 self.toolbar.EnableTool(self.ID_ENCODE, True)
             self.toolbar.EnableTool(self.ID_DECODE, True)
-
-    def Update(self, event):
-        pass
 
 
 class App(wx.App):
