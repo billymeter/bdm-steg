@@ -1,0 +1,12 @@
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.gtk-gui.gui.stetic
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/bin/Debug/Stegalicious.exe.mdb
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/bin/Debug/Stegalicious.exe
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.exe
+/Users/brad/Dropbox/School/Spring 2014/Computer Security/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.exe.mdb
+/Volumes/KINGSTON/bdm-steg/Stegalicious/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Volumes/KINGSTON/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.gtk-gui.gui.stetic
+/Volumes/KINGSTON/bdm-steg/Stegalicious/bin/Debug/Stegalicious.exe.mdb
+/Volumes/KINGSTON/bdm-steg/Stegalicious/bin/Debug/Stegalicious.exe
+/Volumes/KINGSTON/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.exe
+/Volumes/KINGSTON/bdm-steg/Stegalicious/obj/x86/Debug/Stegalicious.exe.mdb
