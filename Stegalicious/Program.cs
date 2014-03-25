@@ -19,7 +19,7 @@ namespace Stegalicious
 			// Hide message
 			MemoryStream stream = new MemoryStream();
 			StreamWriter writer = new StreamWriter(stream);
-			writer.Write("This is a test");
+			writer.Write("Brad Dennys Micah");
 			writer.Flush();
 			stream.Position = 0;
 

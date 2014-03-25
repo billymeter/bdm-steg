@@ -65,15 +65,13 @@ namespace Stegalicious
 			return BitReverseTable[toReverse];
 		}
 
-
+		// This is the workhorse right here. Does all the bit twiddling magic
 		private static void ProcessImage(ref Stream messageStream, Bitmap bitmap, bool extract)
 		{
 			// Maximum X and Y position in picture
 			int bitmapWidth = bitmap.Width - 1;
-			int bitmapHeight = bitmap.Height - 1;
 
 			int bitCount = 0;
-			//int storeBitCount = 8;
 			byte curMessageByte = (byte) 0;
 
 			Color pixelColor;
@@ -84,22 +82,12 @@ namespace Stegalicious
 				pixelColor = bitmap.GetPixel (0, 0);
 				messageLength = (pixelColor.R << 16) + (pixelColor.G << 8) + pixelColor.B;
 				messageStream = new MemoryStream (messageLength);
-				Console.WriteLine ("messageLength extracted: " + messageLength.ToString ());
 			} else {
 				messageLength = (Int32)messageStream.Length;
 				if (messageLength >= 16777215) {
 					String tooBig = "Your message is too long, only 16,777,215 bytes are allowed";
 					throw new Exception (tooBig);
 				}
-
-				// Check the size of the host image
-				// The amount of pixels available
-				long countPixels = (bitmapWidth * bitmapHeight) - 1;
-				// Pixels requires for the message, 3 bits can be stored in a pixel
-				// This is a trick to always round up to the nearest integer
-				long countRequiredPixels = (messageLength * 8 + 2) / 3;
-
-				Console.WriteLine ("Message length: " + messageStream.Length + " Required pixels for message: " + countRequiredPixels.ToString () + " Pixels available: " + countPixels.ToString ());
 
 				// Write the length of the message into the first pixel
 				int colorValue = messageLength;
@@ -126,8 +114,10 @@ namespace Stegalicious
 			Point pixelPosition = new Point (1, 0);
 
 
-			// Trick to round up to the nearest integer
-			int loopCount = (messageLength * 8 + 2) / 3;
+
+			double temp = (messageLength * 8 / 3);
+			//int loopCount = (int)Math.Ceiling (temp);
+			int loopCount = Convert.ToInt32 (temp);
 
 			if (!extract) {
 				curMessageByte = (byte)(messageStream.ReadByte ());
@@ -145,7 +135,6 @@ namespace Stegalicious
 
 					if (bitCount == 7) {
 						bitCount = 0;
-						Console.Write (ReverseByte(curMessageByte).ToString () + " ");
 						messageStream.WriteByte (ReverseByte(curMessageByte));
 						curMessageByte = (byte)0;
 					}
@@ -156,18 +145,16 @@ namespace Stegalicious
 
 					if (bitCount == 7) {
 						bitCount = 0;
-						Console.Write (ReverseByte(curMessageByte).ToString () + " ");
 						messageStream.WriteByte (ReverseByte(curMessageByte));
 						curMessageByte = (byte)0;
 					}
 
 					// Extract the bit from the pixel blue component
-					curMessageByte =(byte) ((curMessageByte | (pixelColor.B & 0x0001)) << 1);
+					curMessageByte = (byte) ((curMessageByte | (pixelColor.B & 0x0001)) << 1);
 					bitCount++;
 
 					if (bitCount == 7) {
 						bitCount = 0;
-						Console.Write (ReverseByte(curMessageByte).ToString () + " ");
 						messageStream.WriteByte (ReverseByte(curMessageByte));
 						curMessageByte = (byte)0;
 					}
@@ -234,6 +221,8 @@ namespace Stegalicious
 				}
 			}
 
+			// extra data gets put in the stream, so just truncate it to the message length
+			messageStream.SetLength (messageLength);
 			bitmap = null;
 		}
 
