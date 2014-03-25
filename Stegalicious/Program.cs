@@ -15,15 +15,14 @@ namespace Stegalicious
 			// test code to make sure the stego stuff works
 			// then work on the gui
 
-
 			// Hide message
-			MemoryStream stream = new MemoryStream();
+			/*MemoryStream stream = new MemoryStream();
 			StreamWriter writer = new StreamWriter(stream);
-			writer.Write("Brad Dennys Micah");
+			writer.Write("Micah loves taco tuesdays");
 			writer.Flush();
 			stream.Position = 0;
 
-			System.Drawing.Image host = System.Drawing.Image.FromFile ("test.png");
+			System.Drawing.Image host = System.Drawing.Image.FromFile ("mario.png");
 			Bitmap hostImage = new Bitmap (host);
 
 			Stego.HideMessage (stream, hostImage);
@@ -47,13 +46,13 @@ namespace Stegalicious
 			fs.Write (streamContent, 0, streamContent.Length);
 			messageStream.Close ();
 			fs.Close ();
-
+			*/
 
 			// The GUI
-			//Application.Init ();
-			//MainWindow win = new MainWindow ();
-			//win.Show ();
-			//Application.Run ();
+			Application.Init ();
+			MainWindow win = new MainWindow ();
+			win.Show ();
+			Application.Run ();
 
 		}
 	}
