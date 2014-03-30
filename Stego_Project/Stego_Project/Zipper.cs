@@ -25,7 +25,7 @@ namespace Stego_Project
             {
                 zip.Password = password; //set password
                 //zip.AddEntry(filename, file);
-                zip.AddFile(filename); //add file to zip directory
+                zip.AddFile(filename, ""); //add file to zip directory
                 zip.Save(file); //save file to a stream
                 //zip.Save("testFile.zip"); //save file to a stream
                

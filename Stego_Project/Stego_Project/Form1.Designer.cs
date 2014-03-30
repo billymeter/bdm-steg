@@ -41,6 +41,7 @@
             this.tableLayoutPanel_Images = new System.Windows.Forms.TableLayoutPanel();
             this.pictureBox_OriginalImage = new System.Windows.Forms.PictureBox();
             this.pictureBox_ProcessedImage = new System.Windows.Forms.PictureBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.panel_Inputs.SuspendLayout();
             this.tableLayoutPanel_Images.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_OriginalImage)).BeginInit();
@@ -49,6 +50,7 @@
             // 
             // panel_Inputs
             // 
+            this.panel_Inputs.Controls.Add(this.progressBar);
             this.panel_Inputs.Controls.Add(this.textBox_SaveTo);
             this.panel_Inputs.Controls.Add(this.button_Save_To);
             this.panel_Inputs.Controls.Add(this.button_GO);
@@ -61,7 +63,7 @@
             this.panel_Inputs.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel_Inputs.Location = new System.Drawing.Point(0, 0);
             this.panel_Inputs.Name = "panel_Inputs";
-            this.panel_Inputs.Size = new System.Drawing.Size(604, 111);
+            this.panel_Inputs.Size = new System.Drawing.Size(598, 111);
             this.panel_Inputs.TabIndex = 0;
             // 
             // textBox_SaveTo
@@ -163,7 +165,7 @@
             this.tableLayoutPanel_Images.RowCount = 1;
             this.tableLayoutPanel_Images.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel_Images.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel_Images.Size = new System.Drawing.Size(604, 296);
+            this.tableLayoutPanel_Images.Size = new System.Drawing.Size(598, 293);
             this.tableLayoutPanel_Images.TabIndex = 0;
             this.tableLayoutPanel_Images.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel_Images_Paint);
             // 
@@ -173,7 +175,7 @@
             this.pictureBox_OriginalImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox_OriginalImage.Location = new System.Drawing.Point(5, 5);
             this.pictureBox_OriginalImage.Name = "pictureBox_OriginalImage";
-            this.pictureBox_OriginalImage.Size = new System.Drawing.Size(293, 286);
+            this.pictureBox_OriginalImage.Size = new System.Drawing.Size(290, 283);
             this.pictureBox_OriginalImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_OriginalImage.TabIndex = 8;
             this.pictureBox_OriginalImage.TabStop = false;
@@ -182,18 +184,27 @@
             // 
             this.pictureBox_ProcessedImage.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox_ProcessedImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_ProcessedImage.Location = new System.Drawing.Point(306, 5);
+            this.pictureBox_ProcessedImage.Location = new System.Drawing.Point(303, 5);
             this.pictureBox_ProcessedImage.Name = "pictureBox_ProcessedImage";
-            this.pictureBox_ProcessedImage.Size = new System.Drawing.Size(293, 286);
+            this.pictureBox_ProcessedImage.Size = new System.Drawing.Size(290, 283);
             this.pictureBox_ProcessedImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ProcessedImage.TabIndex = 9;
             this.pictureBox_ProcessedImage.TabStop = false;
+            // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(5, 87);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(216, 22);
+            this.progressBar.Step = 1;
+            this.progressBar.TabIndex = 9;
+            this.progressBar.Visible = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 407);
+            this.ClientSize = new System.Drawing.Size(598, 404);
             this.Controls.Add(this.tableLayoutPanel_Images);
             this.Controls.Add(this.panel_Inputs);
             this.Name = "Form1";
@@ -222,6 +233,7 @@
         private System.Windows.Forms.PictureBox pictureBox_ProcessedImage;
         private System.Windows.Forms.TextBox textBox_SaveTo;
         private System.Windows.Forms.Button button_Save_To;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 

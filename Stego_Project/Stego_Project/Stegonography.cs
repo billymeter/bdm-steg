@@ -10,7 +10,7 @@ namespace Stego_Project
 {
     class Stegonography
     {
-        static public void HideMessage(MemoryStream messageStream, Bitmap bitmap)
+        static public int HideMessage(MemoryStream messageStream, Bitmap bitmap, ProgressBar progressBar)
         {
             
             //get bytes
@@ -20,7 +20,7 @@ namespace Stego_Project
             {
                 MessageBox.Show("Your file is too long, only 16,777,215 bytes are allowed", 
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
+                return 0;
             }
             //Write Length of the file into the first pixel
             int colorValue = bytes.Length;
@@ -86,7 +86,8 @@ namespace Stego_Project
                     //update mask
                     mask =(byte)(mask << 1);
                     
-                }   
+                }
+                progressBar.PerformStep(); //update progress bar
             }
             //Check if need to set the last pixel
             if (val != 0)
@@ -95,7 +96,7 @@ namespace Stego_Project
                 bitmap.SetPixel(x, y, toSet);
                 
             }
-            
+            return 1;
         }
 
         private static void updateXY(ref int x, ref int y, Bitmap bitmap)
@@ -105,11 +106,20 @@ namespace Stego_Project
                 y++;
         }
 
-        static public void ExtractMessage(Bitmap bitmap, out MemoryStream messageStream)
+        static public int ExtractMessage(Bitmap bitmap, out MemoryStream messageStream, ProgressBar progressBar)
         {
             //Read the length of the file
             Color pixel = bitmap.GetPixel(0, 0);
             int fileLength = (pixel.R << 16) + (pixel.G << 8) + pixel.B;
+            if (fileLength >= 16777215)
+            {
+                MessageBox.Show("You've chosen the wrong image, it does not contain file gidden with this software",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                messageStream = new MemoryStream();
+                return 0;
+            }
+            //Set maximum value of progress bar
+            progressBar.Maximum = fileLength;
             //Initialize memory stream
             messageStream = new MemoryStream(fileLength);
             //x and y coordinates of pixel
@@ -145,8 +155,10 @@ namespace Stego_Project
                 messageStream.WriteByte(message);
                 //reset byte
                 message = (byte)0;
+                //update progress bar
+                progressBar.PerformStep();
             }
-            
+            return 1;   
         }
     }
 }

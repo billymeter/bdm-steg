@@ -26,6 +26,7 @@ namespace Stego_Project
 
         private void radioButton_Encrypt_CheckedChanged(object sender, EventArgs e)
         {
+            this.clearForm();
             this.button_OpenFile_ExtractTo.Text = "Choose File";
             this.button_Save_To.Visible = true;
             this.textBox_SaveTo.Visible = true;
@@ -33,6 +34,7 @@ namespace Stego_Project
 
         private void radioButton_Extract_CheckedChanged(object sender, EventArgs e)
         {
+            this.clearForm();
             this.button_Save_To.Visible = false;
             this.textBox_SaveTo.Visible = false;
             this.button_OpenFile_ExtractTo.Text = "Extract To";
@@ -94,9 +96,9 @@ namespace Stego_Project
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
-                if(this.textBox_File.Text == "")
+                if (this.textBox_File.Text == "" || File.Exists(this.textBox_File.Text) == false)
                 {
-                    MessageBox.Show("File was not specified!\nPlease choose file", "Warning",
+                    MessageBox.Show("File was not specified!\nPlease choose an existing file", "Warning",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
@@ -112,6 +114,8 @@ namespace Stego_Project
                 prompt.ShowDialog();
                 if (prompt.getPasswordText() == "")
                     return;
+                //Show progress bar
+                this.progressBar.Visible = true;
                 //file stream
                 MemoryStream file = new MemoryStream();
                 /*using (FileStream fl = new FileStream(this.textBox_File.Text, FileMode.Open, FileAccess.Read))
@@ -123,15 +127,24 @@ namespace Stego_Project
                 
                 //Zip file
                 Zipper.zipFile(this.textBox_File.Text, prompt.getPasswordText(), out file);
+                //Set progress bar's maximum value
+                this.progressBar.Maximum = (int)file.Length;
                 file.Seek(0, SeekOrigin.Begin);
                 //Create bitmap of the image
                 Bitmap image = new Bitmap(this.pictureBox_OriginalImage.Image);
                 //Hide file
                 //Stegalicious.Stego.HideMessage(file, image);
-                Stego_Project.Stegonography.HideMessage(file, image);
+                if (Stego_Project.Stegonography.HideMessage(file, image, this.progressBar) == 0)
+                {
+                    this.progressBar.Hide();
+                    this.progressBar.Value = 0;
+                    return; //stop execution if program failed
+                }
                 //Show processed image
                 this.pictureBox_ProcessedImage.Image = (Image)image;
                 image.Save(this.textBox_SaveTo.Text, ImageFormat.Png);
+                this.progressBar.Hide();
+                this.progressBar.Value = 0;
                 MessageBox.Show("Done!");
             }
             else
@@ -159,10 +172,15 @@ namespace Stego_Project
                 string password = prompt.getPasswordText();
                 MemoryStream file;
                 Bitmap image = new Bitmap(this.pictureBox_OriginalImage.Image);
-                
+                //Show progress bar
+                this.progressBar.Show();
                 //Extract message
-                //Stegalicious.Stego.ExtractMessage(image, ref file);
-                Stego_Project.Stegonography.ExtractMessage(image, out file);
+                if (Stego_Project.Stegonography.ExtractMessage(image, out file, this.progressBar) == 0)
+                {
+                    this.progressBar.Hide();
+                    this.progressBar.Value = 0;
+                    return; //stop execution if program failed
+                }
                 file.Seek(0, SeekOrigin.Begin);
                 //Unzip message with password
                 Zipper.unzipFile(file, password, this.textBox_File.Text);
@@ -174,6 +192,8 @@ namespace Stego_Project
                     file.Close();
                     fl.Close();
                 }*/
+                this.progressBar.Hide();
+                this.progressBar.Value = 0;
                 MessageBox.Show("Done!");
             }
         }
@@ -189,6 +209,13 @@ namespace Stego_Project
             }
         }
 
-        
+        private void clearForm()
+        {
+            this.textBox_File.Clear();
+            this.textBox_Image.Clear();
+            this.textBox_SaveTo.Clear();
+            this.pictureBox_OriginalImage.Image = null;
+            this.pictureBox_ProcessedImage.Image = null;
+        }
     }
 }
