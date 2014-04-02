@@ -22,6 +22,12 @@ namespace Stego_Project
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return 0;
             }
+            if (bytes.Length >= (3 * (bitmap.Size.Height * bitmap.Size.Width - 1))/8)
+            {
+                MessageBox.Show("Your image is too small(not enough pixels) to hide message",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return 0;
+            }
             //Write Length of the file into the first pixel
             int colorValue = bytes.Length;
 
@@ -114,6 +120,13 @@ namespace Stego_Project
             if (fileLength >= 16777215)
             {
                 MessageBox.Show("You've chosen the wrong image, it does not contain file gidden with this software",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                messageStream = new MemoryStream();
+                return 0;
+            }
+            if (fileLength >= 3 * (bitmap.Size.Height * bitmap.Size.Width - 1))
+            {
+                MessageBox.Show("Your image can not contain file encrypted with this application",
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 messageStream = new MemoryStream();
                 return 0;
