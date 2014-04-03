@@ -33,7 +33,7 @@ namespace Stego_Project
         }
 
         private void radioButton_Extract_CheckedChanged(object sender, EventArgs e)
-        {
+        {  
             this.clearForm();
             this.button_Save_To.Visible = false;
             this.textBox_SaveTo.Visible = false;
@@ -118,13 +118,6 @@ namespace Stego_Project
                 this.progressBar.Visible = true;
                 //file stream
                 MemoryStream file = new MemoryStream();
-                /*using (FileStream fl = new FileStream(this.textBox_File.Text, FileMode.Open, FileAccess.Read))
-                {
-                    byte[] bytes = new byte[fl.Length];
-                    fl.Read(bytes, 0, (int)fl.Length);
-                    file.Write(bytes, 0, (int)fl.Length);
-                }*/
-                
                 //Zip file
                 Zipper.zipFile(this.textBox_File.Text, prompt.getPasswordText(), out file);
                 //Set progress bar's maximum value
@@ -133,7 +126,6 @@ namespace Stego_Project
                 //Create bitmap of the image
                 Bitmap image = new Bitmap(this.pictureBox_OriginalImage.Image);
                 //Hide file
-                //Stegalicious.Stego.HideMessage(file, image);
                 if (Stego_Project.Stegonography.HideMessage(file, image, this.progressBar) == 0)
                 {
                     this.progressBar.Hide();
@@ -143,6 +135,7 @@ namespace Stego_Project
                 //Show processed image
                 this.pictureBox_ProcessedImage.Image = (Image)image;
                 image.Save(this.textBox_SaveTo.Text, ImageFormat.Png);
+                //Hide progress bar
                 this.progressBar.Hide();
                 this.progressBar.Value = 0;
                 MessageBox.Show("Done!");
@@ -184,14 +177,7 @@ namespace Stego_Project
                 file.Seek(0, SeekOrigin.Begin);
                 //Unzip message with password
                 Zipper.unzipFile(file, password, this.textBox_File.Text);
-                /*using (FileStream fl = new FileStream("file.txt", FileMode.Create, System.IO.FileAccess.Write))
-                {
-                    byte[] bytes = new byte[file.Length];
-                    file.Read(bytes, 0, (int)file.Length);
-                    fl.Write(bytes, 0, bytes.Length);
-                    file.Close();
-                    fl.Close();
-                }*/
+                //Hide progress bar
                 this.progressBar.Hide();
                 this.progressBar.Value = 0;
                 MessageBox.Show("Done!");
@@ -199,7 +185,7 @@ namespace Stego_Project
         }
 
         private void button_Save_To_Click(object sender, EventArgs e)
-        {
+        { //open save file dialog
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.Filter = "Image files (PNG)|*.png";
             saveDialog.RestoreDirectory = true;
@@ -210,12 +196,13 @@ namespace Stego_Project
         }
 
         private void clearForm()
-        {
+        { //clear all text boxes and picture boxes
             this.textBox_File.Clear();
             this.textBox_Image.Clear();
             this.textBox_SaveTo.Clear();
             this.pictureBox_OriginalImage.Image = null;
             this.pictureBox_ProcessedImage.Image = null;
+            GC.Collect(); //do garbage collection to remove lock from teh images
         }
     }
 }

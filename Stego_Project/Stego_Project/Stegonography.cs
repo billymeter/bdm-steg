@@ -13,15 +13,16 @@ namespace Stego_Project
         static public int HideMessage(MemoryStream messageStream, Bitmap bitmap, ProgressBar progressBar)
         {
             
-            //get bytes
+            //get bytes of teh file
             byte[] bytes = messageStream.ToArray();
-            //check if image has enough of pixels
-            if (bytes.Length >= 16777215)
+            //check if file is too big
+            if (bytes.Length >= (16777216)/8)
             {
-                MessageBox.Show("Your file is too long, only 16,777,215 bytes are allowed", 
+                MessageBox.Show("Your file is too long, a maximum size of 2MB is allowed", 
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return 0;
             }
+            //check if image has enough number of pixels to hide image
             if (bytes.Length >= (3 * (bitmap.Size.Height * bitmap.Size.Width - 1))/8)
             {
                 MessageBox.Show("Your image is too small(not enough pixels) to hide message",
@@ -41,7 +42,7 @@ namespace Stego_Project
             int blue = colorValue & blueMask;
                     
             bitmap.SetPixel(0, 0, Color.FromArgb(red, green, blue));
-            //x and y coordinates of image
+            //initialize x and y coordinates of image
             int x = 1;
             int y = 0;
             //pixel to be used
@@ -50,12 +51,12 @@ namespace Stego_Project
             byte R = pixel.R;
             byte G = pixel.G;
             byte B = pixel.B;
-            
+            //Loop through each file byte an hide it in the image
             for (int i = 0; i < bytes.Length; i++)
             {
-                byte cur = bytes[i];
-                byte mask = (byte)Convert.ToInt32("00000001", 2);
-                for (int j = 0; j < 8; j++)
+                byte cur = bytes[i]; //get byte value
+                byte mask = (byte)Convert.ToInt32("00000001", 2); //initialize mask
+                for (int j = 0; j < 8; j++) //for each bit in the byte
                 {
                                                       
                     //get bit to set
@@ -81,7 +82,7 @@ namespace Stego_Project
                             byte mask1 = (byte)Convert.ToInt32("00000001", 2);
                             //Update pixel coordinate and reset variables
                             updateXY(ref x, ref y, bitmap);
-                            //get pixel
+                            //get next pixel
                             pixel = bitmap.GetPixel(x, y);
                             R = pixel.R;
                             G = pixel.G;
@@ -89,7 +90,7 @@ namespace Stego_Project
                             val = 0;
                             break;
                     }
-                    //update mask
+                    //update mask for reading teh next bit
                     mask =(byte)(mask << 1);
                     
                 }
@@ -107,8 +108,8 @@ namespace Stego_Project
 
         private static void updateXY(ref int x, ref int y, Bitmap bitmap)
         {
-            x = (x + 1) % bitmap.Size.Width;
-            if (x == 0)
+            x = (x + 1) % bitmap.Size.Width; //increment x value
+            if (x == 0) //check if need to increment y value
                 y++;
         }
 
@@ -117,13 +118,15 @@ namespace Stego_Project
             //Read the length of the file
             Color pixel = bitmap.GetPixel(0, 0);
             int fileLength = (pixel.R << 16) + (pixel.G << 8) + pixel.B;
-            if (fileLength >= 16777215)
+            //Check if file length is within the allowed range
+            if (fileLength >= (16777216)/8)
             {
                 MessageBox.Show("You've chosen the wrong image, it does not contain file gidden with this software",
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 messageStream = new MemoryStream();
                 return 0;
             }
+            //Check if file length is not bigger than the number of pixels
             if (fileLength >= 3 * (bitmap.Size.Height * bitmap.Size.Width - 1))
             {
                 MessageBox.Show("Your image can not contain file encrypted with this application",
@@ -135,18 +138,19 @@ namespace Stego_Project
             progressBar.Maximum = fileLength;
             //Initialize memory stream
             messageStream = new MemoryStream(fileLength);
-            //x and y coordinates of pixel
+            //initialize x and y coordinates of pixel
             int x = 1;
             int y = 0;
             int val = 0; //0 - R, 1 - G, 2 - B
             byte message = (byte)0; //bits will be stored in this variable
+            //initialize mask to get the value of the last bit in the pixel
             byte mask = (byte)Convert.ToInt32("00000001", 2);
-            pixel = bitmap.GetPixel(x, y);
-            for (int i = 0; i < fileLength; i++)
+            pixel = bitmap.GetPixel(x, y); //get next pixel in the image
+            for (int i = 0; i < fileLength; i++) //loop through the image until all bytes are read
             {
-                for (int j = 0; j < 8; j++)
+                for (int j = 0; j < 8; j++) //get the next byte
                 {
-                    switch (val)
+                    switch (val)//read R - 0, G - 1, or B - 2 channel of a pixel
                     {
                         case 0:
                             message = (byte)(message | ((pixel.R & mask) << j));
