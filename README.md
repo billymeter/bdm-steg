@@ -1,6 +1,6 @@
 Stegolicious
 ============
-Crypto project 
-Micah Wine
-Bradley Trotter
-Denys Kukushkin
+Crypto project by
+ * Micah Wine
+ * Bradley Trotter
+ * Denys Kukushkin
