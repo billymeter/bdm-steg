@@ -1,5 +1,5 @@
-bdm-steg
-========
+Stegolicious
+============
 Crypto project 
 Micah Wine
 Bradley Trotter

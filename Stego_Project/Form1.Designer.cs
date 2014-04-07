@@ -208,7 +208,7 @@
             this.Controls.Add(this.tableLayoutPanel_Images);
             this.Controls.Add(this.panel_Inputs);
             this.Name = "Form1";
-            this.Text = "BDM-Stego";
+            this.Text = "Stegolicious";
             this.panel_Inputs.ResumeLayout(false);
             this.panel_Inputs.PerformLayout();
             this.tableLayoutPanel_Images.ResumeLayout(false);

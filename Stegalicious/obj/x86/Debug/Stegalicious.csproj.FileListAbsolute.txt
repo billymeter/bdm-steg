@@ -1,5 +1,0 @@
-F:\bdm-steg\Stegalicious\obj\x86\Debug\Stegalicious.csprojResolveAssemblyReference.cache
-F:\bdm-steg\Stegalicious\obj\x86\Debug\Stegalicious.exe
-F:\bdm-steg\Stegalicious\bin\Debug\Stegalicious.exe
-F:\bdm-steg\Stegalicious\bin\Debug\Stegalicious.pdb
-F:\bdm-steg\Stegalicious\obj\x86\Debug\Stegalicious.pdb
